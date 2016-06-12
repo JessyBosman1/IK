@@ -105,9 +105,13 @@ d3.csv("Data/All_Imports_Ten.csv", function(dataset) {
 			    .y(function(d) { return -1 * y(d); })
 			
 			g.append("svg:path").attr("d", line(data))
+			.style("stroke-width", 1)
+			.transition()
+			.duration(800)
+			
 			.style("font-size", 25)
 			.style("stroke", "red")
-			.style("stroke-width", 2)
+			.style("stroke-width", 3)
             .style("fill", "none");
 			g.append("svg:line")
 			    .attr("x1", x(0))
@@ -207,7 +211,7 @@ function RefreshPie(init) {
         .attr("height", h)
         .append("svg:g")                
         .attr("transform", "translate(" + r + "," + r + ")")   
-			
+		
     var arc = d3.svg.arc()              
         .innerRadius(r/2.2)
 		.outerRadius(r);

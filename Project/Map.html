@@ -61,7 +61,26 @@ var map = new Datamap({
 });
 
 function RefreshChart(init) {
-var selected = null
+var imported = null
+
+var exported = null
+d3.csv("Data/All_Exports_Ten.csv", function(dataset) {
+
+		dataset.forEach(function(d) {
+				if (d.Country == init){
+				d["2005"] = +d["2005"];
+				d["2006"] = +d["2006"];
+				d["2007"] = +d["2007"];
+				d["2008"] = +d["2008"];
+				d["2009"] = +d["2009"];
+				d["2010"] = +d["2010"];
+				d["2011"] = +d["2011"];
+				d["2012"] = +d["2012"];
+				d["2013"] = +d["2013"];
+				d["2014"] = +d["2014"];
+				d["2015"] = +d["2015"];	
+				exported = d}
+				});})
 d3.csv("Data/All_Imports_Ten.csv", function(dataset) {
 
 		dataset.forEach(function(d) {
@@ -77,11 +96,11 @@ d3.csv("Data/All_Imports_Ten.csv", function(dataset) {
 				d["2013"] = +d["2013"];
 				d["2014"] = +d["2014"];
 				d["2015"] = +d["2015"];	
-				selected = d}
+				imported = d}
 				});
 
-		var data = [selected["2005"],selected["2006"],selected["2007"],selected["2008"],selected["2009"],selected["2010"],selected["2011"],selected["2012"],selected["2013"],selected["2014"],selected["2015"]];
-
+		var data = [imported["2005"],imported["2006"],imported["2007"],imported["2008"],imported["2009"],imported["2010"],imported["2011"],imported["2012"],imported["2013"],imported["2014"],imported["2015"]];
+		var data2 = [exported["2005"],exported["2006"],exported["2007"],exported["2008"],exported["2009"],exported["2010"],exported["2011"],exported["2012"],exported["2013"],exported["2014"],exported["2015"]];
 			w = 400,
 			h = 200,
 			margin = 20,
@@ -103,15 +122,26 @@ d3.csv("Data/All_Imports_Ten.csv", function(dataset) {
 			var line = d3.svg.line()
 			    .x(function(d,i) { return x(i); })
 			    .y(function(d) { return -1 * y(d); })
-
+			
+			//Draw line import
 			g.append("svg:path").attr("d", line(data))
 			//Style transition chart
 			.style("stroke-width", 0)
 			.transition()
 			.duration(1500)
-			
 			.style("font-size", 25)
 			.style("stroke", "red")
+			.style("stroke-width", 3)
+            .style("fill", "none");
+			
+			//draw line export
+			g.append("svg:path").attr("d", line(data2))
+			//Style transition chart
+			.style("stroke-width", 0)
+			.transition()
+			.duration(1500)
+			.style("font-size", 25)
+			.style("stroke", "blue")
 			.style("stroke-width", 3)
             .style("fill", "none");
 			

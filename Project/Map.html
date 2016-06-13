@@ -100,7 +100,10 @@ d3.csv("Data/All_Imports_Ten.csv", function(dataset) {
 				});
 
 		var data = [imported["2005"],imported["2006"],imported["2007"],imported["2008"],imported["2009"],imported["2010"],imported["2011"],imported["2012"],imported["2013"],imported["2014"],imported["2015"]];
+		try{
 		var data2 = [exported["2005"],exported["2006"],exported["2007"],exported["2008"],exported["2009"],exported["2010"],exported["2011"],exported["2012"],exported["2013"],exported["2014"],exported["2015"]];
+		}
+		catch(e){}
 			w = 400,
 			h = 200,
 			margin = 20,
@@ -133,7 +136,7 @@ d3.csv("Data/All_Imports_Ten.csv", function(dataset) {
 			.style("stroke", "red")
 			.style("stroke-width", 3)
             .style("fill", "none");
-			
+			try{
 			//draw line export
 			g.append("svg:path").attr("d", line(data2))
 			//Style transition chart
@@ -143,8 +146,9 @@ d3.csv("Data/All_Imports_Ten.csv", function(dataset) {
 			.style("font-size", 25)
 			.style("stroke", "blue")
 			.style("stroke-width", 3)
-            .style("fill", "none");
-			
+            		.style("fill", "none");
+			}
+			catch(e){}
 			g.append("svg:line")
 			    .attr("x1", x(0))
 			    .attr("y1", -1 * y(0))

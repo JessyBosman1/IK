@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+
+<style> /* set the CSS */
+
+body { font: 12px Arial;}
+#Title, #Text{
+font: 50px Impact, Charcoal, sans-serif;
+text-align: center;
+}
+#Text{
+text-transform: uppercase;
+color: red;
+}
+</style>
+
+<body>
+
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+<script src="Import/datamaps.world.min.js"></script>
+
+<div id="Title" style="position: relative; width: 100%; height: 60px;">Arms data of</div>
+<div id="Text" style="position: relative; width: 100%; height: 80px;">the world</div>
+
+<div id="container" style="position: relative; width: 700px; height: 300px; margin:0 auto;"></div>
+<select id ="ImExPort" >
+  <option value="Import">Import</option>
+  <option value="Export">Export</option>
+ </select>
+<div id="ChartContainer" style="position: relative; width: 1000px; height: 300px; margin:0 auto;"></div>
+
+<div id="PieSelect" style="position: relative; width: 1000px; height: 300px; margin:0 auto;">
+<select id ="Year">
+  <option value="2005">2005</option>
+  <option value="2006">2006</option>
+  <option value="2007">2007</option>
+  <option value="2008">2008</option>
+  <option value="2009">2009</option>
+  <option value="2010">2010</option>
+  <option value="2011">2011</option>
+  <option value="2012">2012</option>
+  <option value="2013">2013</option>
+  <option value="2014">2014</option>
+  <option value="2015">2015</option>
+  <option value="Total">Total</option>
+</select>
+<input type="button" value="Generatie Pie Diagram" OnClick="GeneratePie()"/></div>
+
+<div id="PieContainer" style="position: relative; width: 700px; height: 300px; margin-left: 30%;"></div>
+<script>
+
+var init = null
+d3.csv("Data/All_Imports_Ten.csv", function(dataset) {
+
+var map = new Datamap({
+        element: document.getElementById('container'),
+        done: function(datamap) {
+            datamap.svg.selectAll('.datamaps-subunit').on('click', function(map) {
+				//this.style.fill="red";
+                init = map.properties.name;
+				dataset.forEach(function(d) {
+				if (d.Country == init){RefreshChart(init)}
+				});
+					
+            });
+        },
+		geographyConfig: {
+			dataurl: 'top10.csv',
+            highlightOnHover: true,
+            popupOnHover: true}
+    });
+	
+
+});
+
+function RefreshChart(init) {
+var imported = null
+
+var exported = null
+d3.csv("Data/All_Exports_Ten.csv", function(dataset) {
+
+		dataset.forEach(function(d) {
+				if (d.Country == init){
+				d["2005"] = +d["2005"];
+				d["2006"] = +d["2006"];
+				d["2007"] = +d["2007"];
+				d["2008"] = +d["2008"];
+				d["2009"] = +d["2009"];
+				d["2010"] = +d["2010"];
+				d["2011"] = +d["2011"];
+				d["2012"] = +d["2012"];
+				d["2013"] = +d["2013"];
+				d["2014"] = +d["2014"];
+				d["2015"] = +d["2015"];	
+				exported = d}
+				});})
+d3.csv("Data/All_Imports_Ten.csv", function(dataset) {
+
+		dataset.forEach(function(d) {
+				if (d.Country == init){
+				d["2005"] = +d["2005"];
+				d["2006"] = +d["2006"];
+				d["2007"] = +d["2007"];
+				d["2008"] = +d["2008"];
+				d["2009"] = +d["2009"];
+				d["2010"] = +d["2010"];
+				d["2011"] = +d["2011"];
+				d["2012"] = +d["2012"];
+				d["2013"] = +d["2013"];
+				d["2014"] = +d["2014"];
+				d["2015"] = +d["2015"];	
+				imported = d}
+				});
+		var data = null		
+		if(document.getElementById("ImExPort").value == "Import"){
+			data = [imported["2005"],imported["2006"],imported["2007"],imported["2008"],imported["2009"],imported["2010"],imported["2011"],imported["2012"],imported["2013"],imported["2014"],imported["2015"]];
+		}
+		else if (document.getElementById("ImExPort").value == "Export"){
+			data = [exported["2005"],exported["2006"],exported["2007"],exported["2008"],exported["2009"],exported["2010"],exported["2011"],exported["2012"],exported["2013"],exported["2014"],exported["2015"]];
+		}
+			w = 400,
+			h = 200,
+			margin = 20,
+			y = d3.scale.linear().domain([0, d3.max(data)]).range([0 + margin, h - margin]),
+			x = d3.scale.linear().domain([0, data.length]).range([0 + margin, w - margin]);
+		
+		d3.select("#Text")
+			.text(init)
+		
+		ChartContainer.innerHTML = ""; //Clear container
+		var vis = d3.select("#ChartContainer")
+			    .append("svg:svg")
+				.attr("width", w)
+			    .attr("height", h);
+
+			var g = vis.append("svg:g")
+			    .attr("transform", "translate(0, 200)");			
+			
+			var line = d3.svg.line()
+			    .x(function(d,i) { return x(i); })
+			    .y(function(d) { return -1 * y(d); })
+			
+			//Draw line import
+			g.append("svg:path").attr("d", line(data))
+			//Style transition chart
+			.style("stroke-width", 0)
+			.transition()
+			.duration(1500)
+			.style("font-size", 25)
+			.style("stroke", "red")
+			.style("stroke-width", 3)
+            .style("fill", "none");
+			
+			g.append("svg:line")
+			    .attr("x1", x(0))
+			    .attr("y1", -1 * y(0))
+			    .attr("x2", x(w))
+			    .attr("y2", -1 * y(0))
+
+			g.append("svg:line")
+			    .attr("x1", x(0))
+			    .attr("y1", -1 * y(0))
+			    .attr("x2", x(0))
+			    .attr("y2", -1 * y(d3.max(data)))
+			
+			//Labels
+			g.selectAll(".xLabel")
+			    .data(x.ticks(5))
+			    .enter().append("svg:text")
+			    .attr("class", "xLabel")
+			    .text(String)
+			    .attr("x", function(d) { return x(d) })
+			    .attr("y", 0)
+			    .attr("text-anchor", "middle")
+				
+			g.selectAll(".yLabel")
+			    .data(y.ticks(4))
+			    .enter().append("svg:text")
+			    .attr("class", "yLabel")
+			    .text(String)
+			    .attr("x", 0)
+			    .attr("y", function(d) { return -1 * y(d) })
+			    .attr("text-anchor", "right")
+			    .attr("dy", 4)
+				
+			/*//Werkt Nog Niet - Voeg Canvas toe
+			//Y-axis Text
+			vis.append("text")
+				.attr("text-anchor", "middle")
+				.attr("transform", "translate("+ (10/2) +","+(h/2)+")rotate(-90)")
+				.text("Import($)");
+			//X-axis Text
+			vis.append("text")
+				.attr("text-anchor", "middle") 
+				.attr("transform", "translate("+ (w/2) +","+(h+1)+")")
+				.text("Year");
+			*/
+				
+				}
+	)}
+	
+var Year = null
+function GeneratePie() {
+        Year = document.getElementById('Year').value;
+		console.log(Year);
+		RefreshPie(Year)
+       }
+function RefreshPie(init) {
+
+	d3.csv("Data/All_Imports_Ten_Category.csv", function(dataset) {
+		dataset.forEach(function(d) {
+
+				d["2005"] = +d["2005"];
+				d["2006"] = +d["2006"];
+				d["2007"] = +d["2007"];
+				d["2008"] = +d["2008"];
+				d["2009"] = +d["2009"];
+				d["2010"] = +d["2010"];
+				d["2011"] = +d["2011"];
+				d["2012"] = +d["2012"];
+				d["2013"] = +d["2013"];
+				d["2014"] = +d["2014"];
+				d["2015"] = +d["2015"];	
+				d["Total"] = +d["Total"];	
+				}
+				);
+
+        var width = 100;
+        var height = 100;	
+		
+		var w = 600,                       
+		h = 600,                        
+		r = 300,                            
+		color = d3.scale.category20c();  
+	
+        var radius = Math.min(width, height) / 2;
+        var color = d3.scale.category20b();
+		
+		PieContainer.innerHTML = "";	//Clear container
+		var vis = d3.select("#PieContainer")
+        .append("svg:svg")             
+        .data([dataset])                  
+        .attr("width", w)           
+        .attr("height", h)
+        .append("svg:g")                
+        .attr("transform", "translate(" + r + "," + r + ")")   
+		
+    var arc = d3.svg.arc()              
+        .innerRadius(r/2.2)
+		.outerRadius(r);
+		
+    var pie = d3.layout.pie()           
+        .value(function(d) {return d[init]; })   
+		
+    var arcs = vis.selectAll("g.slice")     
+        .data(pie)                         
+        .enter()                            
+           .append("svg:g")               
+                .attr("class", "slice");  
+        arcs.append("svg:path")    
+            .attr("d", arc) 
+
+	
+	//Pie Animations
+	.on("mouseover", function(d, i) {
+        d3.select(this)
+           .attr("stroke","white")
+           .transition()
+           .duration(1000)           
+           .attr("stroke-width",6)
+		   .style("opacity", 0.7);
+		   
+          arcs.append("text")
+            .attr("dy", ".5em")
+            .style("text-anchor", "middle")
+			.attr("class","label")
+			
+			.style("font-size", 0)
+			.transition()
+			.duration(1000)
+            .style("font-size", 20)
+            .style("fill", function(d,i){return "black";})
+            .text(dataset[i].category + ": " + dataset[i][init] + "M$ ");
+		
+      })
+	  
+      .on("mouseout", function(d) {
+        d3.select(this).transition()            
+           .attr("stroke","none")
+		   .style("opacity", 1);
+		   
+        arcs.select(".label").remove();
+      })
+	  
+	//transition Piegram fade in  
+	.attr("fill", "white" )  
+    .transition()
+	.duration(1500)
+	.attr("fill", function(d, i) { return color(i); } )
+	arcs.append("path")		
+		
+		var getAngle = function (d) {
+			return (180 / Math.PI * (d.startAngle + d.endAngle) / 2 + 90);
+		}; 
+        arcs.append("svg:text")
+				//transition enter text
+				.transition()
+				.duration(1500)
+				.attr("transform", function(d) {                   
+                d.innerRadius = 200;
+                d.outerRadius = r;
+				d.Angle = 90;
+                return "translate(" + arc.centroid(d) + ") rotate("+ getAngle(d) +")";
+            })
+			.style("font-size", 15)
+            .attr("text-anchor", "middle")
+			.style("fill", function(d,i){return "white";})			
+            .text(function(d, i) {return dataset[i].category ; });   		
+		  });
+	}		  
+
+</script>
+<script>
+
+</script>
+</body>
+</html>
